@@ -67,9 +67,10 @@ const WhyChooseUsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Magnetic card effect
+  // Subtle card hover effect
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>, index: number) => {
     const card = cardsRef.current[index];
     if (!card || window.innerWidth < 768) return;
@@ -78,192 +79,120 @@ const WhyChooseUsSection = () => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Update CSS variables for gradient spotlight
     card.style.setProperty('--mouse-x', `${x}px`);
     card.style.setProperty('--mouse-y', `${y}px`);
-
-    // Calculate rotation based on mouse position
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = (y - centerY) / 20;
-    const rotateY = -(x - centerX) / 20;
-
-    gsap.to(card, {
-      rotateX,
-      rotateY,
-      duration: 0.3,
-      ease: 'power2.out',
-      overwrite: 'auto',
-    });
-  }, []);
-
-  const handleMouseLeave = useCallback((index: number) => {
-    const card = cardsRef.current[index];
-    if (!card) return;
-
-    gsap.to(card, {
-      rotateX: 0,
-      rotateY: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-      overwrite: 'auto',
-    });
   }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
     const title = titleRef.current;
     const grid = gridRef.current;
+    const stats = statsRef.current;
 
-    if (!section || !title || !grid) return;
+    if (!section || !title || !grid || !stats) return;
 
-    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      // Title animation
+      // Title animation - clean slide up
       gsap.fromTo(
         title.querySelectorAll('.animate-item'),
-        { y: 60, opacity: 0 },
+        { y: 40, opacity: 0 },
         {
           y: 0,
           opacity: 1,
           stagger: 0.1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: section,
             start: 'top 80%',
-            toggleActions: 'play reverse play reverse',
+            toggleActions: 'play none none reverse',
           },
         }
       );
 
-      // Mobile animations - simpler stagger
-      mm.add('(max-width: 767px)', () => {
-        const cards = grid.querySelectorAll('.why-card');
-        cards.forEach((card, index) => {
-          gsap.fromTo(
-            card,
-            { y: 50, opacity: 0, scale: 0.95 },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              duration: 0.5,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                toggleActions: 'play reverse play reverse',
-              },
-            }
-          );
-        });
-      });
-
-      // Desktop animations - wave pattern with 3D
-      mm.add('(min-width: 768px)', () => {
-        const cards = grid.querySelectorAll('.why-card');
-        
-        // Set perspective on grid
-        gsap.set(grid, { perspective: 1000 });
-        gsap.set(cards, { transformStyle: 'preserve-3d' });
-
-        cards.forEach((card, index) => {
-          // Calculate wave delay based on row and column
-          const row = Math.floor(index / 3);
-          const col = index % 3;
-          const waveDelay = (row * 0.1) + (col * 0.08);
-
-          gsap.fromTo(
-            card,
-            { 
-              y: 100, 
-              opacity: 0, 
-              scale: 0.85,
-              rotationX: 15,
-              rotationY: col === 0 ? -10 : col === 2 ? 10 : 0,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              rotationX: 0,
-              rotationY: 0,
-              duration: 0.8,
-              delay: waveDelay,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: grid,
-                start: 'top 80%',
-                toggleActions: 'play reverse play reverse',
-              },
-            }
-          );
-
-          // Animate icon with bounce
-          const icon = card.querySelector('.card-icon');
-          if (icon) {
-            gsap.fromTo(
-              icon,
-              { scale: 0, rotation: -30 },
-              {
-                scale: 1,
-                rotation: 0,
-                duration: 0.6,
-                delay: waveDelay + 0.2,
-                ease: 'back.out(1.7)',
-                scrollTrigger: {
-                  trigger: grid,
-                  start: 'top 80%',
-                  toggleActions: 'play reverse play reverse',
-                },
-              }
-            );
-          }
-
-          // Animate stat counter
-          const stat = card.querySelector('.card-stat');
-          if (stat) {
-            gsap.fromTo(
-              stat,
-              { y: 20, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.5,
-                delay: waveDelay + 0.3,
-                ease: 'power2.out',
-                scrollTrigger: {
-                  trigger: grid,
-                  start: 'top 80%',
-                  toggleActions: 'play reverse play reverse',
-                },
-              }
-            );
-          }
-        });
-      });
-
-      // Floating background elements
-      const bgElements = section.querySelectorAll('.bg-float');
-      bgElements.forEach((el, i) => {
-        gsap.to(el, {
-          y: -40 + (i * 15),
-          x: (i % 2 === 0 ? 20 : -20),
-          rotation: i * 10,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 2,
+      // Cards animation - clean staggered slide up
+      const cards = grid.querySelectorAll('.why-card');
+      gsap.fromTo(
+        cards,
+        { y: 60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: {
+            amount: 0.4,
+            from: 'start',
           },
-        });
-      });
+          duration: 0.5,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      // Icons scale in
+      const icons = grid.querySelectorAll('.card-icon');
+      gsap.fromTo(
+        icons,
+        { scale: 0.8, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          stagger: {
+            amount: 0.4,
+            from: 'start',
+          },
+          duration: 0.4,
+          ease: 'back.out(1.5)',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      // Stats bar animation
+      gsap.fromTo(
+        stats,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: stats,
+            start: 'top 90%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      // Stats numbers animation
+      const statItems = stats.querySelectorAll('.stat-item');
+      gsap.fromTo(
+        statItems,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.4,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: stats,
+            start: 'top 90%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
     }, section);
 
     return () => {
       ctx.revert();
-      mm.revert();
     };
   }, []);
 
@@ -273,13 +202,8 @@ const WhyChooseUsSection = () => {
       id="why-us"
       className="slide-section py-20 md:py-32 relative overflow-hidden"
     >
-      {/* Background decorations */}
-      <div className="absolute inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
-      
-      {/* Floating background elements */}
-      <div className="bg-float absolute top-32 left-[10%] w-64 h-64 rounded-full bg-gradient-radial opacity-20 blur-3xl pointer-events-none" />
-      <div className="bg-float absolute bottom-32 right-[10%] w-80 h-80 rounded-full bg-gradient-radial opacity-15 blur-3xl pointer-events-none" />
-      <div className="bg-float absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-radial opacity-10 blur-3xl pointer-events-none" />
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/3 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Title */}
@@ -306,11 +230,9 @@ const WhyChooseUsSection = () => {
               ref={(el) => (cardsRef.current[index] = el)}
               className="why-card group cursor-pointer"
               onMouseMove={(e) => handleMouseMove(e, index)}
-              onMouseLeave={() => handleMouseLeave(index)}
-              style={{ transformStyle: 'preserve-3d' }}
             >
               {/* Icon */}
-              <div className={`card-icon w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${reason.gradient} flex items-center justify-center mb-5 shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+              <div className={`card-icon w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${reason.gradient} flex items-center justify-center mb-5 shadow-lg transition-transform duration-300 group-hover:scale-105`}>
                 <reason.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
 
@@ -336,18 +258,18 @@ const WhyChooseUsSection = () => {
               <div 
                 className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                 style={{
-                  background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsla(var(--primary), 0.06), transparent 40%)`,
+                  background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsla(var(--primary), 0.04), transparent 40%)`,
                 }}
               />
 
               {/* Corner accent */}
-              <div className={`absolute top-0 right-0 w-20 h-20 rounded-bl-3xl rounded-tr-3xl bg-gradient-to-bl ${reason.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+              <div className={`absolute top-0 right-0 w-16 h-16 rounded-bl-3xl rounded-tr-3xl bg-gradient-to-bl ${reason.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
             </div>
           ))}
         </div>
 
         {/* Bottom stats row */}
-        <div className="mt-16 md:mt-24">
+        <div ref={statsRef} className="mt-16 md:mt-24">
           <div className="glass-premium p-6 md:p-8 max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
               {[
@@ -356,7 +278,7 @@ const WhyChooseUsSection = () => {
                 { value: '5+', label: 'Years Experience' },
                 { value: '99%', label: 'Client Retention' },
               ].map((item, index) => (
-                <div key={index} className="space-y-1">
+                <div key={index} className="stat-item space-y-1">
                   <div className="text-2xl md:text-4xl font-bold gradient-text">
                     {item.value}
                   </div>
@@ -374,4 +296,3 @@ const WhyChooseUsSection = () => {
 };
 
 export default WhyChooseUsSection;
-

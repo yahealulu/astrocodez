@@ -70,138 +70,78 @@ const ServicesSection = () => {
 
     if (!section || !title || !grid) return;
 
-    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      // Title animation with cinematic reveal
+      // Title animation - clean slide up with fade
       gsap.fromTo(
         title.querySelectorAll('.animate-item'),
         { 
-          y: 60, 
+          y: 40, 
           opacity: 0,
-          filter: 'blur(8px)',
         },
         {
           y: 0,
           opacity: 1,
-          filter: 'blur(0px)',
-          stagger: 0.12,
-          duration: 0.8,
-          ease: 'power4.out',
+          stagger: 0.1,
+          duration: 0.6,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: section,
-            start: 'top 85%',
-            toggleActions: 'play reverse play reverse',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
           },
         }
       );
 
-      // Mobile: simpler stagger animation
-      mm.add('(max-width: 767px)', () => {
-        const cards = grid.querySelectorAll('.service-card');
-        cards.forEach((card, index) => {
-          gsap.fromTo(
-            card,
-            { 
-              y: 50, 
-              opacity: 0,
-              scale: 0.95,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              duration: 0.5,
-              delay: index * 0.08,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 92%',
-                toggleActions: 'play reverse play reverse',
-              },
-            }
-          );
-        });
-      });
-
-      // Desktop: 3D wave animation
-      mm.add('(min-width: 768px)', () => {
-        // Set perspective on grid
-        gsap.set(grid, { perspective: 1200 });
-        
-        const cards = grid.querySelectorAll('.service-card');
-        cards.forEach((card, index) => {
-          // Calculate wave delay based on position
-          const row = Math.floor(index / 3);
-          const col = index % 3;
-          // Wave propagates from top-left to bottom-right
-          const waveDelay = (row * 0.1) + (col * 0.08);
-
-          gsap.fromTo(
-            card,
-            { 
-              y: 100, 
-              opacity: 0, 
-              scale: 0.85,
-              rotationX: 20,
-              rotationY: col === 0 ? -15 : col === 2 ? 15 : 0,
-              filter: 'blur(5px)',
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              rotationX: 0,
-              rotationY: 0,
-              filter: 'blur(0px)',
-              duration: 0.8,
-              delay: waveDelay,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: grid,
-                start: 'top 82%',
-                toggleActions: 'play reverse play reverse',
-              },
-            }
-          );
-
-          // Animate icon with bounce
-          const icon = card.querySelector('.service-icon');
-          if (icon) {
-            gsap.fromTo(
-              icon,
-              { scale: 0, rotation: -45 },
-              {
-                scale: 1,
-                rotation: 0,
-                duration: 0.6,
-                delay: waveDelay + 0.2,
-                ease: 'back.out(1.7)',
-                scrollTrigger: {
-                  trigger: grid,
-                  start: 'top 82%',
-                  toggleActions: 'play reverse play reverse',
-                },
-              }
-            );
-          }
-        });
-
-        // Floating ambient animation on scroll
-        gsap.to(grid, {
-          y: -20,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 3,
+      // Cards animation - clean, professional slide up with stagger
+      const cards = grid.querySelectorAll('.service-card');
+      gsap.fromTo(
+        cards,
+        { 
+          y: 60, 
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: {
+            amount: 0.4, // Total stagger time
+            from: 'start',
           },
-        });
-      });
+          duration: 0.5,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+
+      // Icons scale in after cards
+      const icons = grid.querySelectorAll('.service-icon');
+      gsap.fromTo(
+        icons,
+        { scale: 0.8, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          stagger: {
+            amount: 0.4,
+            from: 'start',
+          },
+          duration: 0.4,
+          ease: 'back.out(1.5)',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
     }, section);
 
     return () => {
       ctx.revert();
-      mm.revert();
     };
   }, []);
 
@@ -211,12 +151,8 @@ const ServicesSection = () => {
       id="services"
       className="slide-section py-16 md:py-28 relative"
     >
-      {/* Background decorations */}
-      <div className="absolute inset-0 bg-gradient-mesh opacity-20 pointer-events-none" />
-      
-      {/* Floating decorative elements */}
-      <div className="absolute top-20 right-[5%] w-64 h-64 rounded-full bg-gradient-radial opacity-15 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-[5%] w-80 h-80 rounded-full bg-gradient-radial opacity-10 blur-3xl pointer-events-none" />
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Title */}
@@ -236,19 +172,17 @@ const ServicesSection = () => {
         <div
           ref={gridRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7 max-w-6xl mx-auto"
-          style={{ transformStyle: 'preserve-3d' }}
         >
           {services.map((service, index) => (
             <div
               key={index}
               ref={(el) => (cardsRef.current[index] = el)}
               className="service-card group cursor-pointer p-6 md:p-8"
-              style={{ transformStyle: 'preserve-3d' }}
               onMouseMove={(e) => handleMouseMove(e, index)}
             >
               {/* Icon */}
               <div
-                className={`service-icon w-14 h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-5 md:mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg`}
+                className={`service-icon w-14 h-14 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-5 md:mb-6 transition-all duration-300 group-hover:scale-105 shadow-lg`}
               >
                 <service.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
@@ -275,7 +209,7 @@ const ServicesSection = () => {
               </div>
 
               {/* Corner glow on hover */}
-              <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-20 blur-2xl transition-opacity duration-500 pointer-events-none`} />
+              <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-15 blur-2xl transition-opacity duration-500 pointer-events-none`} />
             </div>
           ))}
         </div>
