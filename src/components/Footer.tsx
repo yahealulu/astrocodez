@@ -8,7 +8,9 @@ gsap.registerPlugin(ScrollTrigger);
 const footerLinks = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
+  { label: 'Process', href: '#process' },
   { label: 'Services', href: '#services' },
+  { label: 'Why Us', href: '#why-us' },
   { label: 'Team', href: '#team' },
   { label: 'Contact', href: '#contact' },
 ];
