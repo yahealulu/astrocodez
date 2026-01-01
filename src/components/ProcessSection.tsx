@@ -254,6 +254,18 @@ const ProcessSection = () => {
       id="process"
       className="slide-section py-20 md:py-32 relative"
     >
+      {/* SVG Gradient Definitions */}
+      <svg className="absolute w-0 h-0">
+        <defs>
+          {processSteps.map((step, idx) => (
+            <linearGradient key={idx} id={`icon-gradient-${idx}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={step.gradient.includes('purple') ? '#a855f7' : step.gradient.includes('indigo') ? '#6366f1' : step.gradient.includes('blue') ? '#3b82f6' : step.gradient.includes('cyan') ? '#06b6d4' : '#14b8a6'} />
+              <stop offset="100%" stopColor={step.gradient.includes('indigo') ? '#6366f1' : step.gradient.includes('blue') ? '#3b82f6' : step.gradient.includes('cyan') ? '#06b6d4' : step.gradient.includes('teal') ? '#14b8a6' : '#22c55e'} />
+            </linearGradient>
+          ))}
+        </defs>
+      </svg>
+
       {/* Background decorations */}
       <div className="absolute inset-0 bg-gradient-mesh opacity-30 pointer-events-none" />
       
@@ -326,8 +338,20 @@ const ProcessSection = () => {
                     </div>
 
                     {/* Icon */}
-                    <div className="step-icon icon-container w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-background to-muted flex items-center justify-center mb-5 border border-border/50">
-                      <step.icon className={`w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br ${step.gradient} bg-clip-text`} style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text' }} />
+                    <div className="step-icon icon-container w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-background to-muted flex items-center justify-center mb-5 border border-border/50 relative overflow-hidden group/icon">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-20 group-hover/icon:opacity-30 transition-opacity duration-300`} />
+                      <div className="relative z-10 w-7 h-7 md:w-8 md:h-8">
+                        <step.icon 
+                          className="w-full h-full" 
+                          style={{ 
+                            stroke: `url(#icon-gradient-${index})`,
+                            fill: 'none',
+                            strokeWidth: 2.5,
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round'
+                          }} 
+                        />
+                      </div>
                     </div>
 
                     {/* Content */}
