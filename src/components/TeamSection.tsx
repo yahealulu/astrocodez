@@ -275,8 +275,8 @@ const TeamSection = () => {
               ref={(el) => (cardsRef.current[index] = el)}
               className={`team-card-wrapper group relative h-[400px] w-full cursor-pointer 
                 ${index === 3 ? 'lg:col-span-1 xl:col-span-1' : ''} 
-                ${index === 6 ? 'md:col-span-2 lg:col-span-3 xl:col-span-1 xl:col-start-2' : ''}
-              `} // Custom spanning for uneven grid to center items
+                ${index === 6 ? 'md:col-span-1 lg:col-span-1 xl:col-span-1' : ''}
+              `} // DevOps appears beside Backend
               onMouseMove={(e) => handleMouseMove(e, index)}
               onMouseLeave={() => handleMouseLeave(index)}
             >
